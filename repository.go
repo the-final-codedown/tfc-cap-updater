@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type repository interface {
-	Create(downscale *cap.CapDownscale) error
+	Create(*cap.CapDownscale) error
 	GetAll() ([]*cap.CapDownscale, error)
 }
 
@@ -17,8 +18,13 @@ type MongoRepository struct {
 }
 
 // Create -
+// https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
 func (repository *MongoRepository) Create(downscale *cap.CapDownscale) error {
-	_, err := repository.collection.InsertOne(context.Background(), downscale)
+	filter := bson.D{{"accountID", downscale.AccountID}}
+	update := bson.D{{"$inc", bson.D{
+		{"value", -downscale.Delta},
+	}}}
+	_, err := repository.collection.UpdateOne(context.Background(), filter, update, nil)
 	return err
 }
 

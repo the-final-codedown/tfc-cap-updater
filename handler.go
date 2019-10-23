@@ -11,9 +11,10 @@ type handler struct {
 
 func (s *handler) DownscaleCap(ctx context.Context, req *cap.CapDownscale, res *cap.DownscaleResponse) error {
 	println("DownscaleCap")
-	/*if err := s.repository.Create(req); err != nil {
+
+	if err := s.repository.Create(req); err != nil {
 		return err
-	}*/
+	}
 	res.Accepted = true
 	println(res.Accepted)
 	return nil
