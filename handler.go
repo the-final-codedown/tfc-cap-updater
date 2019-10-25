@@ -9,15 +9,17 @@ type handler struct {
 	repository
 }
 
-func (s *handler) DownscaleCap(ctx context.Context, req *cap.CapDownscale, res *cap.DownscaleResponse) error {
+func (s *handler) DownscaleCap(ctx context.Context, req *cap.CapDownscale) (*cap.DownscaleResponse, error) {
 	println("DownscaleCap")
 
 	if err := s.repository.Create(req); err != nil {
-		return err
+		return nil, err
 	}
-	res.Accepted = true
+	res := cap.DownscaleResponse{
+		Accepted: true,
+	}
 	println(res.Accepted)
-	return nil
+	return &res, nil
 }
 
 // GetConsignments -

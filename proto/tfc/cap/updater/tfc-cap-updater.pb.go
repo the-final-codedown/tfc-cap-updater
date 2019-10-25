@@ -4,15 +4,13 @@
 package tfc_cap_updater
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
-)
-
-import (
-	client "github.com/micro/go-micro/client"
-	server "github.com/micro/go-micro/server"
-	context "golang.org/x/net/context"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -192,57 +190,80 @@ var fileDescriptor_c4143ba0c3384ac8 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ client.Option
-var _ server.Option
+var _ grpc.ClientConn
 
-// Client API for CapUpdaterService service
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
 
+// CapUpdaterServiceClient is the client API for CapUpdaterService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CapUpdaterServiceClient interface {
-	DownscaleCap(ctx context.Context, in *CapDownscale, opts ...client.CallOption) (*DownscaleResponse, error)
+	DownscaleCap(ctx context.Context, in *CapDownscale, opts ...grpc.CallOption) (*DownscaleResponse, error)
 }
 
 type capUpdaterServiceClient struct {
-	c           client.Client
-	serviceName string
+	cc *grpc.ClientConn
 }
 
-func NewCapUpdaterServiceClient(serviceName string, c client.Client) CapUpdaterServiceClient {
-	if c == nil {
-		c = client.NewClient()
-	}
-	if len(serviceName) == 0 {
-		serviceName = "tfc.cap.updater"
-	}
-	return &capUpdaterServiceClient{
-		c:           c,
-		serviceName: serviceName,
-	}
+func NewCapUpdaterServiceClient(cc *grpc.ClientConn) CapUpdaterServiceClient {
+	return &capUpdaterServiceClient{cc}
 }
 
-func (c *capUpdaterServiceClient) DownscaleCap(ctx context.Context, in *CapDownscale, opts ...client.CallOption) (*DownscaleResponse, error) {
-	req := c.c.NewRequest(c.serviceName, "CapUpdaterService.DownscaleCap", in)
+func (c *capUpdaterServiceClient) DownscaleCap(ctx context.Context, in *CapDownscale, opts ...grpc.CallOption) (*DownscaleResponse, error) {
 	out := new(DownscaleResponse)
-	err := c.c.Call(ctx, req, out, opts...)
+	err := c.cc.Invoke(ctx, "/tfc.cap.updater.CapUpdaterService/DownscaleCap", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for CapUpdaterService service
-
-type CapUpdaterServiceHandler interface {
-	DownscaleCap(context.Context, *CapDownscale, *DownscaleResponse) error
+// CapUpdaterServiceServer is the server API for CapUpdaterService service.
+type CapUpdaterServiceServer interface {
+	DownscaleCap(context.Context, *CapDownscale) (*DownscaleResponse, error)
 }
 
-func RegisterCapUpdaterServiceHandler(s server.Server, hdlr CapUpdaterServiceHandler, opts ...server.HandlerOption) {
-	s.Handle(s.NewHandler(&CapUpdaterService{hdlr}, opts...))
+// UnimplementedCapUpdaterServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedCapUpdaterServiceServer struct {
 }
 
-type CapUpdaterService struct {
-	CapUpdaterServiceHandler
+func (*UnimplementedCapUpdaterServiceServer) DownscaleCap(ctx context.Context, req *CapDownscale) (*DownscaleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownscaleCap not implemented")
 }
 
-func (h *CapUpdaterService) DownscaleCap(ctx context.Context, in *CapDownscale, out *DownscaleResponse) error {
-	return h.CapUpdaterServiceHandler.DownscaleCap(ctx, in, out)
+func RegisterCapUpdaterServiceServer(s *grpc.Server, srv CapUpdaterServiceServer) {
+	s.RegisterService(&_CapUpdaterService_serviceDesc, srv)
+}
+
+func _CapUpdaterService_DownscaleCap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CapDownscale)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CapUpdaterServiceServer).DownscaleCap(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/tfc.cap.updater.CapUpdaterService/DownscaleCap",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CapUpdaterServiceServer).DownscaleCap(ctx, req.(*CapDownscale))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _CapUpdaterService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "tfc.cap.updater.CapUpdaterService",
+	HandlerType: (*CapUpdaterServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "DownscaleCap",
+			Handler:    _CapUpdaterService_DownscaleCap_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/tfc/cap/updater/tfc-cap-updater.proto",
 }

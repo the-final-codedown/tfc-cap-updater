@@ -3,23 +3,53 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/micro/go-micro"
+	_ "github.com/jnewmano/grpc-json-proxy/codec"
 	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	"google.golang.org/grpc"
+	"io/ioutil"
 	"log"
+	"net"
+	"net/http"
 	"os"
 )
 
 const (
-	port        = ":50051"
+	defaultPort = ":50051"
 	defaultHost = "mongodb://localhost:27017"
 )
 
+func getCaps() ([]byte, error) {
+	response, err := http.Get("http://app:8081/accounts/ID/caps")
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return nil, err
+	} else {
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(string(data))
+		return data, nil
+	}
+	/*jsonData := map[string]string{"money": "", "cap": "Raboy"}
+	jsonValue, _ := json.Marshal(jsonData)
+	response, err = http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	} else {
+		data, _ := ioutil.ReadAll(response.Body)
+		fmt.Println(string(data))
+	}*/
+}
+
 func main() {
-	// Set-up micro instance
-	srv := micro.NewService(
-		micro.Name("go.micro.api.cap"),
-	)
-	srv.Init()
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = defaultPort
+	}
+
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
 
 	uri := os.Getenv("DB_HOST")
 	if uri == "" {
@@ -37,11 +67,9 @@ func main() {
 	repository := &MongoRepository{capCollection}
 	h := &handler{repository}
 
-	// Register handlers
-	cap.RegisterCapUpdaterServiceHandler(srv.Server(), h)
+	cap.RegisterCapUpdaterServiceServer(s, h)
 
-	// Run the server
-	if err := srv.Run(); err != nil {
-		fmt.Println(err)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
 	}
 }
