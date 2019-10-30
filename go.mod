@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/armon/go-metrics v0.0.0-20190430140413-ec5e00d3c878 // indirect
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1 // indirect

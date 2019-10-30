@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 )
 
 const (
@@ -49,7 +50,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.MaxConcurrentStreams(1000),
+		grpc.ConnectionTimeout(5 * time.Second),
+		grpc.MaxConcurrentStreams(10))
 
 	uri := os.Getenv("DB_HOST")
 	if uri == "" {

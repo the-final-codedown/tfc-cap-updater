@@ -5,6 +5,7 @@ import (
 	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type repository interface {
@@ -24,8 +25,13 @@ func (repository *MongoRepository) Create(downscale *cap.CapDownscale) error {
 	update := bson.D{{"$inc", bson.D{
 		{"value", -downscale.Delta},
 	}}}
-	_, err := repository.collection.UpdateOne(context.Background(), filter, update, nil)
-	return err
+
+	upsert := true
+
+	if _, err := repository.collection.UpdateOne(context.Background(), filter, update, &options.UpdateOptions{Upsert: &upsert} ); err != nil {
+		print(err)
+	}
+	return nil
 }
 
 // GetAll -

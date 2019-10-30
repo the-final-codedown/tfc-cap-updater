@@ -10,15 +10,15 @@ type handler struct {
 }
 
 func (s *handler) DownscaleCap(ctx context.Context, req *cap.CapDownscale) (*cap.DownscaleResponse, error) {
-	println("DownscaleCap")
-
+	println("DownscaleCap : ", req.AccountID, " ", req.Delta)
 	if err := s.repository.Create(req); err != nil {
-		return nil, err
+		print(err)
 	}
+
 	res := cap.DownscaleResponse{
 		Accepted: true,
 	}
-	println(res.Accepted)
+	//println(res.Accepted)
 	return &res, nil
 }
 
