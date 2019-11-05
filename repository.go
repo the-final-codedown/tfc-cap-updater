@@ -5,7 +5,7 @@ import (
 	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 type repository interface {
@@ -21,15 +21,15 @@ type MongoRepository struct {
 // Create -
 // https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
 func (repository *MongoRepository) Create(downscale *cap.CapDownscale) error {
-	filter := bson.D{{"accountId", downscale.AccountID}}
+	filter := bson.M{"accountid": downscale.AccountID}
 	update := bson.D{{"$inc", bson.D{
 		{"value", -downscale.Value},
 	}}}
 
-	upsert := true
+	//upsert := true
 
-	if _, err := repository.collection.UpdateOne(context.Background(), filter, update, &options.UpdateOptions{Upsert: &upsert} ); err != nil {
-		print(err)
+	if _, err := repository.collection.UpdateOne(context.Background(), filter, update); err != nil {
+		log.Println(err)
 	}
 	return nil
 }

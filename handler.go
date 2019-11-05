@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	"log"
 )
 
 type handler struct {
@@ -10,9 +11,9 @@ type handler struct {
 }
 
 func (s *handler) DownscaleCap(ctx context.Context, req *cap.CapDownscale) (*cap.DownscaleResponse, error) {
-	println("DownscaleCap : ", req.AccountID, " ", req.Value)
+	log.Println("DownscaleCap : ", req.AccountID, " ", req.Value)
 	if err := s.repository.Create(req); err != nil {
-		print(err)
+		log.Println(err)
 	}
 
 	res := cap.DownscaleResponse{
