@@ -9,7 +9,8 @@ import (
 )
 
 type repository interface {
-	Create(*cap.CapDownscale) error
+	Downscale(*cap.CapDownscale) error
+	Upscale(*cap.CapDownscale) error
 	GetAll() ([]*cap.CapDownscale, error)
 }
 
@@ -18,15 +19,29 @@ type MongoRepository struct {
 	collection *mongo.Collection
 }
 
-// Create -
+// Downscale -
 // https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
-func (repository *MongoRepository) Create(downscale *cap.CapDownscale) error {
+func (repository *MongoRepository) Downscale(downscale *cap.CapDownscale) error {
 	filter := bson.M{"accountid": downscale.AccountID}
 	update := bson.D{{"$inc", bson.D{
 		{"value", -downscale.Value},
+		{"money", -downscale.Value},
 	}}}
 
-	//upsert := true
+	if _, err := repository.collection.UpdateOne(context.Background(), filter, update); err != nil {
+		log.Println(err)
+	}
+	return nil
+}
+
+// Upscale -
+// https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
+func (repository *MongoRepository) Upscale(downscale *cap.CapDownscale) error {
+	filter := bson.M{"accountid": downscale.AccountID}
+	update := bson.D{{"$set", bson.D{
+		{"value", downscale.Value},
+		{"money", downscale.Money},
+	}}}
 
 	if _, err := repository.collection.UpdateOne(context.Background(), filter, update); err != nil {
 		log.Println(err)

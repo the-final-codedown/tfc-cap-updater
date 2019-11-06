@@ -41,6 +41,7 @@ func getCaps() ([]byte, error) {
 }
 
 func main() {
+
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		port = defaultPort
@@ -51,7 +52,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer(grpc.MaxConcurrentStreams(1000),
-		grpc.ConnectionTimeout(5 * time.Second),
+		grpc.ConnectionTimeout(5*time.Second),
 		grpc.MaxConcurrentStreams(10))
 
 	uri := os.Getenv("DB_HOST")
@@ -69,6 +70,9 @@ func main() {
 
 	repository := &MongoRepository{capCollection}
 	h := &handler{repository}
+	go func() {
+		h.ReadCapUpdates()
+	}()
 
 	cap.RegisterCapUpdaterServiceServer(s, h)
 
