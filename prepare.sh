@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make build
+docker build -t tfc/tfc-cap-updater -f Dockerfile-build .

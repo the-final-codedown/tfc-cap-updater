@@ -55,11 +55,13 @@ func main() {
 		grpc.ConnectionTimeout(5*time.Second),
 		grpc.MaxConcurrentStreams(10))
 
-	uri := os.Getenv("DB_HOST")
-	if uri == "" {
-		uri = defaultHost
+    uri := ""
+	if os.Getenv("DB_HOST") != "" && os.Getenv("DB_PORT") != "" {
+		uri = "mongodb://" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT")
+	} else {
+	    uri = defaultHost
 	}
-
+    println(uri)
 	client, err := CreateClient(uri)
 	if err != nil {
 		log.Panic(err)
