@@ -4,21 +4,20 @@ RUN go get github.com/gogo/protobuf/protoc-gen-gofast
 
 WORKDIR /app
 
-ADD go.mod /app
-ADD go.sum /app
+ADD go.mod .
+ADD go.sum .
+ADD ./vendor ./vendor
 
-RUN go mod download
-
-ADD . /app
-#RUN make build
+ADD ./proto ./proto
+ADD *.go ./
 
 RUN protoc -I. --gofast_out=plugins=grpc:. proto/tfc/cap/updater/tfc-cap-updater.proto
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o tfc-cap-updater -a -installsuffix cgo main.go repository.go handler.go datastore.go reader.go
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -mod vendor -o tfc-cap-updater -a -installsuffix cgo main.go repository.go handler.go datastore.go reader.go
 
 FROM alpine:3.11.3
 ENV app=tfc-cap-updater
 
 WORKDIR /app
-COPY --from=builder /app/$app /app/$app
+COPY --from=builder /app/$app ./$app
 
 CMD ./$app

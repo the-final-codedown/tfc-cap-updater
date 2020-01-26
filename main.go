@@ -61,7 +61,7 @@ func main() {
 	} else {
 	    uri = defaultHost
 	}
-    println(uri)
+
 	client, err := CreateClient(uri)
 	if err != nil {
 		log.Panic(err)

@@ -18,7 +18,7 @@ require (
 	github.com/micro/go-micro v1.13.2
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
-	github.com/segmentio/kafka-go v0.3.4 // indirect
+	github.com/segmentio/kafka-go v0.3.4
 	github.com/tidwall/pretty v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.1.2
 	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
