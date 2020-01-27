@@ -2,14 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	_ "github.com/jnewmano/grpc-json-proxy/codec"
-	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	cap "github.com/the-final-codedown/tfc-cap-updater/proto"
 	"google.golang.org/grpc"
-	"io/ioutil"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"time"
 )
@@ -18,27 +15,6 @@ const (
 	defaultPort = ":50051"
 	defaultHost = "mongodb://localhost:27017"
 )
-
-func getCaps() ([]byte, error) {
-	response, err := http.Get("http://app:8081/accounts/ID/caps")
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-		return nil, err
-	} else {
-		data, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(string(data))
-		return data, nil
-	}
-	/*jsonData := map[string]string{"money": "", "cap": "Raboy"}
-	jsonValue, _ := json.Marshal(jsonData)
-	response, err = http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(jsonValue))
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-	} else {
-		data, _ := ioutil.ReadAll(response.Body)
-		fmt.Println(string(data))
-	}*/
-}
 
 func main() {
 
@@ -55,11 +31,11 @@ func main() {
 		grpc.ConnectionTimeout(5*time.Second),
 		grpc.MaxConcurrentStreams(10))
 
-    uri := ""
+	uri := ""
 	if os.Getenv("DB_HOST") != "" && os.Getenv("DB_PORT") != "" {
 		uri = "mongodb://" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT")
 	} else {
-	    uri = defaultHost
+		uri = defaultHost
 	}
 
 	client, err := CreateClient(uri)

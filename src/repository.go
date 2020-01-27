@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	cap "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	cap "github.com/the-final-codedown/tfc-cap-updater/proto"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -30,6 +30,7 @@ func (repository *MongoRepository) Downscale(downscale *cap.CapDownscale) error 
 
 	if _, err := repository.collection.UpdateOne(context.Background(), filter, update); err != nil {
 		log.Println(err)
+		return err
 	}
 	return nil
 }
