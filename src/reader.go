@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
-	tfc_cap_updater "github.com/the-final-codedown/tfc-cap-updater/proto/tfc/cap/updater"
+	cap "github.com/the-final-codedown/tfc-cap-updater/proto"
 	"log"
 	"math"
 )
@@ -40,7 +40,7 @@ func (h *handler) ReadCapUpdates() {
 		if err := json.Unmarshal(m.Value, &result); err != nil {
 			log.Println("Error in parsing GET cap request")
 		}
-		downscale := tfc_cap_updater.CapDownscale{
+		downscale := cap.CapDownscale{
 			AccountID: string(m.Key),
 			Value:     int32(math.Min(float64(result.Money), float64(result.AmountSlidingWindow))),
 			Money:     result.Money}
