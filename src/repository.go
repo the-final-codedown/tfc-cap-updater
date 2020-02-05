@@ -22,7 +22,7 @@ type MongoRepository struct {
 // Downscale -
 // https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
 func (repository *MongoRepository) Downscale(downscale *cap.CapDownscale) error {
-	filter := bson.M{"accountid": downscale.AccountID}
+	filter := bson.M{"_id": downscale.AccountID}
 	update := bson.D{{"$inc", bson.D{
 		{"value", -downscale.Value},
 		{"money", -downscale.Value},
@@ -38,7 +38,7 @@ func (repository *MongoRepository) Downscale(downscale *cap.CapDownscale) error 
 // Upscale -
 // https://stackoverflow.com/questions/55564562/what-is-the-bson-syntax-for-set-in-updateone-for-the-official-mongo-go-driver
 func (repository *MongoRepository) Upscale(downscale *cap.CapDownscale) error {
-	filter := bson.M{"accountid": downscale.AccountID}
+	filter := bson.M{"_id": downscale.AccountID}
 	update := bson.D{{"$set", bson.D{
 		{"value", downscale.Value},
 		{"money", downscale.Money},
